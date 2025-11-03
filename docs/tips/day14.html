@@ -1,0 +1,98 @@
+<p>
+  When you need to compare how values are distributed across categories,
+  <strong>box plots</strong> and <strong>violin plots</strong> are your best friends.
+  They show medians, spread, and symmetry at a glance — revealing patterns that simple averages can hide.
+</p>
+
+<h4>Box plot — the statistical summary</h4>
+<pre><code class="language-python">
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+# Example dataset
+np.random.seed(42)
+df = pd.DataFrame({
+    "group": np.repeat(["A", "B", "C"], 100),
+    "value": np.concatenate([
+        np.random.normal(0, 1, 100),
+        np.random.normal(1, 1.2, 100),
+        np.random.normal(2, 0.8, 100)
+    ])
+})
+
+sns.set_theme(style="whitegrid")
+sns.boxplot(data=df, x="group", y="value", palette="Set2")
+
+plt.title("Box Plot — Distribution Summary")
+plt.show()
+</code></pre>
+
+<p>
+  A box plot shows the <em>median</em> (line), <em>interquartile range</em> (box),
+  and potential outliers (points beyond the whiskers).
+  It’s ideal for comparing groups quickly.
+</p>
+
+<h4>Violin plot — distribution shape</h4>
+<pre><code class="language-python">
+sns.violinplot(data=df, x="group", y="value", inner="quartile", cut=0, palette="Set3")
+plt.title("Violin Plot — Distribution Shape")
+plt.show()
+</code></pre>
+
+<p>
+  A violin plot adds a kernel density estimate on each side of the box,
+  showing whether the distribution is symmetric, skewed, or multimodal.
+  The <code>cut=0</code> parameter prevents the violin from extending beyond the observed data range.
+</p>
+
+<h4>Combine and compare</h4>
+<pre><code class="language-python">
+# Combine both for richer insight
+sns.violinplot(data=df, x="group", y="value", color="0.9", inner=None)
+sns.boxplot(data=df, x="group", y="value", width=0.2, showcaps=False, boxprops={"zorder": 2})
+plt.title("Box + Violin Combined")
+plt.show()
+</code></pre>
+
+<p>
+  Overlaying box plots on violins can give you both precision and shape —
+  just be sure to tone down colors for readability.
+</p>
+
+<h4>Orientation and grouping</h4>
+<pre><code class="language-python">
+# Horizontal orientation
+sns.boxplot(data=df, y="group", x="value", orient="h")
+
+# Multiple subgroups
+df["condition"] = np.random.choice(["X", "Y"], size=len(df))
+sns.boxplot(data=df, x="group", y="value", hue="condition", palette="muted")
+</code></pre>
+
+<p>
+  Orientation can make comparisons easier for long labels,
+  and using <code>hue</code> reveals differences between subgroups in the same figure.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Box plots emphasize statistical landmarks (median, quartiles).
+  Violin plots emphasize the <em>shape</em> of the data.
+  Use box plots for concise comparisons and violins for deeper distribution insight —
+  or combine both for the best of each world.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://seaborn.pydata.org/generated/seaborn.boxplot.html" target="_blank">
+    seaborn.boxplot() documentation
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://seaborn.pydata.org/generated/seaborn.violinplot.html" target="_blank">
+    seaborn.violinplot() documentation
+  </a>
+</p>
+

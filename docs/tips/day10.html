@@ -1,0 +1,80 @@
+<p>
+  Axis transformations can reveal hidden patterns in your data.
+  In <strong>Matplotlib</strong>, you can switch between linear, logarithmic, and symmetric log scales —
+  or even invert axes entirely — with just a few lines.
+</p>
+
+<h4>Basic example</h4>
+<pre><code class="language-python">
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(1, 100, 200)
+y = x ** 2
+
+fig, ax = plt.subplots()
+ax.plot(x, y, label="y = x²")
+
+ax.set_xscale("linear")
+ax.set_yscale("log")     # logarithmic y-axis
+ax.set_xlabel("x")
+ax.set_ylabel("y (log scale)")
+ax.set_title("Log Scales and Axis Tricks")
+ax.legend(frameon=False)
+
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<p>
+  The <code>set_yscale("log")</code> call compresses large values and spreads small ones,
+  making exponential or power-law relationships easier to visualize.
+</p>
+
+<h4>Switching scales</h4>
+<pre><code class="language-python">
+ax.set_xscale("log")     # both axes log
+ax.set_yscale("symlog")  # symmetric log: handles negatives
+ax.set_yscale("logit")   # for proportions (0–1)
+</code></pre>
+
+<p>
+  <code>"symlog"</code> adds a linear region around zero, while <code>"logit"</code> is handy for probabilities.
+</p>
+
+<h4>Inverting axes</h4>
+<pre><code class="language-python">
+ax.invert_xaxis()   # flip left↔right
+ax.invert_yaxis()   # flip up↔down
+</code></pre>
+
+<p>
+  Axis inversion is useful for geological or imaging data, where the origin is traditionally at the top.
+</p>
+
+<h4>Fine control</h4>
+<pre><code class="language-python">
+ax.set_xlim(1, 100)
+ax.set_ylim(1e0, 1e5)
+ax.grid(True, which="both", ls="--", lw=0.5)
+ax.minorticks_on()   # minor ticks on log scales
+</code></pre>
+
+<p>
+  The combination of gridlines and minor ticks is especially helpful when working with log scales —
+  it gives visual anchors without overwhelming the viewer.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  When plotting data that spans several orders of magnitude,
+  always consider a log scale — it can reveal structure where a linear plot looks flat.
+  But remember: log scales only work for positive values (unless you use <code>symlog</code>).
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xscale.html" target="_blank">
+    Matplotlib scales and transformations
+  </a>
+</p>

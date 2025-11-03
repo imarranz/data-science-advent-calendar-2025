@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Data Science Advent Calendar</title>
+<style>
+/* ===========================
+   Calendario DS · Estilos base
+   =========================== */
+
+:root{
+  /* Paleta */
+  --process-yellow: #F9E300;          /* R249 G227 B0 */
+  --process-magenta: #D10074;         /* R209 G0 B116 */
+  --process-cyan: #009FDA;            /* R0 G159 B218 */
+  --process-black: #1E1E1E;           /* R30 G30 B30 */
+  --negro: #000000;                   /* Negro (Black C) */
+  --blanco: #FFFFFF;                  /* Blanco */
+  --amarillo: #FECC00;                /* R254 G203 B0 (116 C) */
+  --azul-ciencia: #6B99A6;            /* R107 G153 B166 (7696 C) */
+  --verde-innovacion: #82E5B8;        /* R130 G229 B184 (345 C) */
+  --morado: #5C2959;                  /* R92 G41 B89 (7652 C) */
+
+  --amarillo-claro: #FFEF80;          /* R255 G239 B128 */
+  --amarillo-medio-oscuro: #CC9B00;   /* R204 G155 B0 */
+  --amarillo-sombra: #996A00;         /* R153 G106 B0 */
+
+  --azul-ciencia-claro: #B7D3DB;      /* R183 G211 B219 */
+  --azul-ciencia-medio-oscuro: #3A6674; /* R58 G102 B116 */
+  --azul-ciencia-sombra: #224B58;     /* R34 G75 B88 */
+
+  --verde-innovacion-claro: #C6F9E1;  /* R198 G249 B225 */
+  --verde-innovacion-medio-oscuro: #3CAD85; /* R60 G173 B133 */
+  --verde-innovacion-sombra: #14795A; /* R20 G121 B90 */
+
+  --morado-claro: #BC9ABB;            /* R188 G154 B187 */
+  --morado-medio-oscuro: #42153F;     /* R66 G21 B63 */
+  --morado-sombra: #260A2A;           /* R38 G10 B42 */
+
+  /* Layout */
+  --radius: 20px;
+  --gap: 1rem;
+
+  /* Imagen decorativa de regalo */
+  --gift-size: 130px;                   /* tamaño base */
+  --gift-offset: 0.75rem;               /* separación a bordes */
+  --gift-opacity: 0.80;                 /* discreta para legibilidad */
+  --gift-url: url("img/presents.png");   /* ruta por defecto */
+}
+
+/* Tipografía y fondo general */
+* { box-sizing: border-box; }
+html, body { position: relative; }
+
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 2rem;
+  background: var(--amarillo-claro); /* el color base */
+  color: var(--negro);
+  line-height: 1.5;
+  position: relative; /* necesario para el ::after */
+}
+
+/* La capa decorativa de regalos */
+body::after {
+  content: "";
+  position: fixed;          /* se pega abajo-dcha aunque hagas scroll */
+  right: 0;
+  bottom: 0;
+  width: min(60vw, 900px);  /* escala según pantalla */
+  height: auto;
+  aspect-ratio: 4 / 3;      /* mantiene proporción */
+  background-image: url("img/presents-background.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: right bottom;
+  opacity: 0.42;            /* sutil para no competir con el contenido */
+  pointer-events: none;     /* clics pasan al contenido */
+  z-index: 0;               /* por debajo de las tarjetas */
+}
+
+/* Aseguramos que tarjetas y grid están por encima */
+.grid, .card {
+  position: relative;
+  z-index: 2;
+}
+
+/* Título y subtítulo */
+h1{
+  margin: 0 0 1rem 0;
+  font-size: clamp(3.6rem, 2vw + 1rem, 2.4rem);
+  text-align: center;
+  color: var(--negro);
+}
+.meta{
+  max-width: 80ch;
+  margin: 0 auto 1.5rem auto;
+  text-align: center;
+  color: rgba(0,0,0,.75);
+}
+
+/* Grid de 3 columnas fijas (como pediste) */
+.grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* siempre 3 por fila */
+  gap: var(--gap);
+}
+
+/* ===== Tarjeta ===== */
+.card{
+  position: relative;                 /* para ::after */
+  overflow: hidden;                   /* recorta imagen decorativa si sobresale */
+  background: var(--azul-ciencia-claro);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  min-height: 180px;                  /* altura base coherente en cerrado */
+  transition: transform .18s ease;
+}
+.card:hover { transform: translateY(-5px); }
+
+/* Imagen decorativa por debajo del contenido */
+.card::after{
+  content: "";
+  position: absolute;
+  right: var(--gift-offset);
+  bottom: var(--gift-offset);
+  width: var(--gift-size);
+  height: var(--gift-size);
+  background-image: var(--gift-url);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--gift-opacity);
+  z-index: 1;                         /* debajo del contenido */
+  pointer-events: none;
+  transform: translate(8px, 8px);
+  transition: transform .25s ease, opacity .25s ease, width .25s ease, height .25s ease;
+}
+
+/* Todo el contenido por encima de la imagen */
+.card > *{ position: relative; z-index: 2; }
+
+/* Al abrir: la imagen “respira” un poco */
+.card.open::after{
+  width: calc(var(--gift-size) * 1.15);
+  height: calc(var(--gift-size) * 1.15);
+  opacity: 0.22;
+  transform: translate(0, 0);
+}
+
+/* Cabecera de la tarjeta */
+.card-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  background: var(--azul-ciencia-sombra);
+  color: var(--blanco);
+  padding: .8rem 1rem;
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
+.card-header h2{
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* Badge del día (protagonismo al amarillo) */
+.badge{
+  background: var(--amarillo);
+  color: var(--negro);
+  font-weight: 800;
+  padding: 0.25rem 0.6rem;
+  border-radius: 75%;
+  min-width: 1.6rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+
+/* Acciones (permalink + botón) */
+.actions{
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem; }
+
+.permalink{
+  text-decoration: none;
+  font-size: .95rem;
+  color: var(--blanco);
+  opacity: .9;
+}
+
+.permalink:hover{
+  color: var(--verde-innovacion);
+}
+
+/* Botón Abrir/Cerrar */
+.toggle{
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--amarillo);
+  color: var(--negro);
+  border: none;
+  padding: .45rem .8rem;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s ease, transform .05s ease;
+}
+.toggle:hover{ background: #f2c800; }
+.toggle:active{ transform: translateY(1px); }
+.toggle[aria-expanded="true"]{ background: #ffd83a; }
+
+/* Panel desplegable con animación sin “saltos” */
+.panel{
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .25s ease;
+}
+.panel-inner{
+  overflow: hidden;
+  padding: 0 1rem;                    /* cerrado */
+}
+.card.open .panel{ grid-template-rows: 1fr; }
+.card.open .panel-inner{ padding: 1rem; } /* abierto */
+
+/* Contenido y bloques de código */
+.content p{ margin: .5rem 0; }
+.content a{ color: #0b4f63; text-decoration: underline; }
+
+.content code, .content pre{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  background: rgba(255,255,255,0.9);
+  color: #202020;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 8px;
+}
+.content code{ padding: .15rem .35rem; }
+.content pre{
+  padding: .8rem;
+  overflow: auto;
+  margin: .5rem 0;
+}
+
+/* Estado bloqueado (slots futuros con mismo tamaño y posición) */
+.card.locked{
+  opacity: .65;
+  filter: grayscale(.05);
+  pointer-events: none;             /* no interactúan */
+}
+.card.locked .toggle{ display: none; }
+.card.locked .card-header{
+  background: color-mix(in srgb, var(--azul-ciencia) 70%, white 30%);
+  color: #2b3a40;
+}
+
+/* Accesibilidad: reduce movimiento si el usuario lo pide */
+@media (prefers-reduced-motion: reduce){
+  .card::after,
+  .panel{ transition: none; }
+  .toggle:active{ transform: none; }
+}
+
+.two-column {
+  display: flex;
+  align-items: flex-start; /* o center, según prefieras */
+  gap: 1rem;
+}
+
+.card-image {
+  flex: 0 0 150px; /* ancho fijo para la imagen */
+}
+
+.card-image img {
+  max-width: 100%;
+  border-radius: 4px; /* opcional, bordes suavizados */
+}
+
+.card-text {
+  flex: 1; /* ocupa el espacio restante */
+}
+
+/* (Opcional) Helpers de responsive:
+   si en algún momento quieres 2 o 1 columna, descomenta:
+
+@media (max-width: 1100px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px){  .grid{ grid-template-columns: 1fr; } }
+*/
+<link rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+      <text y='0.9em' font-size='85'>🎁</text></svg>">
+
+</style>
+
+</head>
+<body>
+
+<h1>Data Science Advent Calendar</h1>
+<p class="meta">24 days of cards, each day unlocking resources, libraries, books, or clever coding tips.</p>
+
+<section class="grid" id="cal-grid">
+  <article class="card" id="dia-1">
+    <header class="card-header">
+      <h2><span class="badge">1</span> DataFrame vs Series in <em>pandas</em></h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-1" aria-label="Permalink to day 1">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-1">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-1" role="region" aria-labelledby="dia-1">
+      <div class="panel-inner content" data-tip="tips/day1.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-2">
+    <header class="card-header">
+      <h2><span class="badge">2</span> Read CSV + peek rows (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-2" aria-label="Permalink to day 2">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-2">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-2" role="region" aria-labelledby="dia-2">
+      <div class="panel-inner content" data-tip="tips/day2.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-3">
+    <header class="card-header">
+      <h2><span class="badge">3</span> <code>loc</code> vs <code>iloc</code> (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-3" aria-label="Permalink to day 3">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-3">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-3" role="region" aria-labelledby="dia-3">
+      <div class="panel-inner content" data-tip="tips/day3.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-4">
+    <header class="card-header">
+      <h2><span class="badge">4</span> Handle missing values (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-4" aria-label="Permalink to day 4">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-4">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-4" role="region" aria-labelledby="dia-4">
+      <div class="panel-inner content" data-tip="tips/day4.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-5">
+    <header class="card-header">
+      <h2><span class="badge">5</span> Group &amp; aggregate (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-5" aria-label="Permalink to day 5">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-5">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-5" role="region" aria-labelledby="dia-5">
+      <div class="panel-inner content" data-tip="tips/day5.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-6">
+    <header class="card-header">
+      <h2><span class="badge">6</span> Broadcasting (<em>NumPy</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-6" aria-label="Permalink to day 6">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-6">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-6" role="region" aria-labelledby="dia-6">
+      <div class="panel-inner content" data-tip="tips/day6.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-7">
+    <header class="card-header">
+      <h2><span class="badge">7</span> Index &amp; slice ND arrays (<em>NumPy</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-7" aria-label="Permalink to day 7">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-7">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-7" role="region" aria-labelledby="dia-7">
+      <div class="panel-inner content" data-tip="tips/day7.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-8">
+    <header class="card-header">
+      <h2><span class="badge">8</span> Convert between <em>NumPy</em> and <em>pandas</em></h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-8" aria-label="Permalink to day 8">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-8">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-8" role="region" aria-labelledby="dia-8">
+      <div class="panel-inner content" data-tip="tips/day8.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-9">
+    <header class="card-header">
+      <h2><span class="badge">9</span> Elegant legend (<em>matplotlib</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-9" aria-label="Permalink to day 9">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-9">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-9" role="region" aria-labelledby="dia-9">
+      <div class="panel-inner content" data-tip="tips/day9.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-10">
+    <header class="card-header">
+      <h2><span class="badge">10</span> Log scales &amp; axis tricks (<em>matplotlib</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-10" aria-label="Permalink to day 10">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-10">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-10" role="region" aria-labelledby="dia-10">
+      <div class="panel-inner content" data-tip="tips/day10.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-11">
+    <header class="card-header">
+      <h2><span class="badge">11</span> Inset/secondary view (<em>matplotlib</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-11" aria-label="Permalink to day 11">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-11">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-11" role="region" aria-labelledby="dia-11">
+      <div class="panel-inner content" data-tip="tipds/day11.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-12">
+    <header class="card-header">
+      <h2><span class="badge">12</span> Scatter + regression (<em>seaborn</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-12" aria-label="Permalink to day 12">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-12">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-12" role="region" aria-labelledby="dia-12">
+      <div class="panel-inner content" data-tip="tips/day12.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-13">
+    <header class="card-header">
+      <h2><span class="badge">13</span> Style &amp; palette (<em>seaborn</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-13" aria-label="Permalink to day 13">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-13">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-13" role="region" aria-labelledby="dia-13">
+      <div class="panel-inner content" data-tip="tips/day13.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-14">
+    <header class="card-header">
+      <h2><span class="badge">14</span> Box &amp; violin plots (<em>seaborn</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-14" aria-label="Permalink to day 14">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-14">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-14" role="region" aria-labelledby="dia-14">
+      <div class="panel-inner content" data-tip="tips/day14.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-15">
+    <header class="card-header">
+      <h2><span class="badge">15</span> Quick EDA combo (<em>pandas</em> + <em>seaborn</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-15" aria-label="Permalink to day 15">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-15">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-15" role="region" aria-labelledby="dia-15">
+      <div class="panel-inner content" data-tip="tips/day15.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-16">
+    <header class="card-header">
+      <h2><span class="badge">16</span> Speed tips on big tables (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-16" aria-label="Permalink to day 16">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-16">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-16" role="region" aria-labelledby="dia-16">
+      <div class="panel-inner content" data-tip="tips/day16.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-17">
+    <header class="card-header">
+      <h2><span class="badge">17</span> Concatenate vs merge/join (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-17" aria-label="Permalink to day 17">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-17">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-17" role="region" aria-labelledby="dia-17">
+      <div class="panel-inner content" data-tip="tips/day17.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-18">
+    <header class="card-header">
+      <h2><span class="badge">18</span> Pivot vs melt (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-18" aria-label="Permalink to day 18">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-18">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-18" role="region" aria-labelledby="dia-18">
+      <div class="panel-inner content" data-tip="tips/day18.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-19">
+    <header class="card-header">
+      <h2><span class="badge">19</span> Titles, labels, annotations (<em>matplotlib</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-19" aria-label="Permalink to day 19">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-19">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-19" role="region" aria-labelledby="dia-19">
+      <div class="panel-inner content" data-tip="tips/day19.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-20">
+    <header class="card-header">
+      <h2><span class="badge">20</span> Save high-resolution figures (<em>matplotlib</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-20" aria-label="Permalink to day 20">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-20">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-20" role="region" aria-labelledby="dia-20">
+      <div class="panel-inner content" data-tip="tips/day20.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-21">
+    <header class="card-header">
+      <h2><span class="badge">21</span> Unique values &amp; counts (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-21" aria-label="Permalink to day 21">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-21">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-21" role="region" aria-labelledby="dia-21">
+      <div class="panel-inner content" data-tip="day21.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-22">
+    <header class="card-header">
+      <h2><span class="badge">22</span> Datetime index &amp; resampling (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-22" aria-label="Permalink to day 22">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-22">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-22" role="region" aria-labelledby="dia-22">
+      <div class="panel-inner content" data-tip="tips/day22.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-23">
+    <header class="card-header">
+      <h2><span class="badge">23</span> Categorical features (<em>pandas</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-23" aria-label="Permalink to day 23">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-23">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-23" role="region" aria-labelledby="dia-23">
+      <div class="panel-inner content" data-tip="tips/day23.html">
+      </div>
+    </div>
+  </article>
+
+  <article class="card" id="dia-24">
+    <header class="card-header">
+      <h2><span class="badge">24</span> Clean multi-subplot layouts (<em>matplotlib</em>)</h2>
+      <div class="actions">
+        <a class="permalink" href="#dia-24" aria-label="Permalink to day 24">#</a>
+        <button class="toggle" aria-expanded="false" aria-controls="panel-24">Open</button>
+      </div>
+    </header>
+    <div class="panel" id="panel-24" role="region" aria-labelledby="dia-24">
+      <div class="panel-inner content" data-tip="tips/day24.html">
+      </div>
+    </div>
+  </article>
+
+</section>
+
+<script>
+  // Toggle accesible
+  function toggleCard(card, forceOpen) {
+    const btn = card.querySelector('.toggle');
+    const panel = card.querySelector('.panel');
+    const isOpen = forceOpen !== undefined ? !forceOpen : card.classList.contains('open');
+    card.classList.toggle('open', !isOpen);
+    btn.setAttribute('aria-expanded', String(!isOpen));
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.toggle');
+    if (!btn) return;
+    const card = btn.closest('.card');
+    toggleCard(card);
+    // Actualiza el hash para compartir el día abierto
+    history.replaceState(null, '', '#' + card.id);
+  });
+
+  // Abrir desde hash o ?dia=12
+  function openFromURL() {
+    const params = new URLSearchParams(location.search);
+    const qDay = params.get('dia');
+    const hash = location.hash.replace('#', '');
+    const id = qDay ? `dia-${qDay}` : (hash || '');
+    if (!id) return;
+    const card = document.getElementById(id);
+    if (card) {
+      toggleCard(card, true);
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+  window.addEventListener('hashchange', openFromURL);
+  window.addEventListener('DOMContentLoaded', openFromURL);
+
+  // Progressive enhancement: si no hay JS, el contenido queda oculto por CSS;
+  // si quieres que sea visible sin JS, añade la clase 'open' en el HTML del día actual.
+
+  // ==========================
+  // Bloqueo por fecha (reglas Adviento)
+  // ==========================
+  (function () {
+    // Simulación opcional: pon una fecha ISO ('2025-12-10') o null para usar la real
+    const FECHA_FORZADA = '2025-12-05'; //const FECHA_FORZADA = null;
+
+    // Rango del calendario de adviento
+    const START_MONTH = 11; // diciembre (0=enero,...,11=diciembre)
+    const START_DAY   = 1;
+    const END_DAY     = 24;
+
+    const hoy = FECHA_FORZADA ? new Date(FECHA_FORZADA) : new Date();
+    const ahora = isNaN(hoy.getTime()) ? new Date() : hoy;
+
+    function diaDesbloqueado(now) {
+      const y = now.getFullYear();
+      const inicio = new Date(y, START_MONTH, START_DAY); // 1 dic y
+      const fin    = new Date(y, START_MONTH, END_DAY);   // 24 dic y
+      if (now < inicio) return 0;               // antes de dic: nada
+      if (now > fin)    return END_DAY;         // después del 24: todo
+      return now.getDate();                     // en diciembre: hasta hoy
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const maxDia = diaDesbloqueado(ahora);
+
+      document.querySelectorAll('.card').forEach(card => {
+        card.classList.remove('locked');
+        const m = /^dia-(\d+)$/.exec(card.id || '');
+        if (!m) return;
+        const dia = parseInt(m[1], 10);
+
+        if (dia > maxDia) {
+          card.classList.add('locked');
+          const btn = card.querySelector('.toggle');
+          if (btn) btn.setAttribute('aria-disabled', 'true');
+        }
+      });
+
+      console.log(
+        '[Advent] Fecha usada:',
+        ahora.toISOString().slice(0,10),
+        '| maxDia=', maxDia
+      );
+    });
+  })();
+
+  // =============================================
+  // Lazy-load each day's tip content from a file
+  // =============================================
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.panel-inner.content[data-tip]').forEach(async (el) => {
+      const url = el.dataset.tip;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const html = await res.text();
+        el.innerHTML = html;
+      } catch (err) {
+        console.error('Failed to load', url, err);
+        el.innerHTML = `<p style="color:#900">⚠️ Could not load tip content.</p>`;
+      }
+    });
+  });
+
+</script>
+
+</body>
+</html>
+

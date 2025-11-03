@@ -1,0 +1,86 @@
+<p>
+  One of <strong>Seaborn’s</strong> best features is its built-in sense of style.
+  With a couple of lines, you can make all your plots share a consistent, professional look that’s both readable and publication-ready.
+</p>
+
+<h4>Set a global theme</h4>
+<pre><code class="language-python">
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+# Global style for all plots
+sns.set_theme(style="whitegrid", palette="deep")
+
+# Example dataset
+x = np.linspace(0, 10, 100)
+df = pd.DataFrame({"x": x, "sin": np.sin(x), "cos": np.cos(x)})
+
+sns.lineplot(data=df, x="x", y="sin", label="sin(x)")
+sns.lineplot(data=df, x="x", y="cos", label="cos(x)")
+plt.title("Seaborn Style & Palette")
+plt.show()
+</code></pre>
+
+<p>
+  The theme controls the overall background, grid, and axes style.
+  The palette defines the color cycle used for lines, bars, or points.
+</p>
+
+<h4>Available styles</h4>
+<pre><code class="language-python">
+for style in ["white", "dark", "whitegrid", "darkgrid", "ticks"]:
+    sns.set_style(style)
+    sns.lineplot(data=df, x="x", y="sin")
+    plt.title(style)
+    plt.show()
+</code></pre>
+
+<p>
+  <code>whitegrid</code> is popular for clarity on numeric data,
+  while <code>dark</code> or <code>ticks</code> gives a more minimalist tone.
+</p>
+
+<h4>Color palettes</h4>
+<pre><code class="language-python">
+# Named palettes
+sns.set_palette("pastel")
+sns.set_palette("muted")
+sns.set_palette("colorblind")  # accessible palette
+
+# Custom palettes from color maps
+palette = sns.color_palette("viridis", as_cmap=True)
+sns.heatmap(np.random.rand(10, 10), cmap=palette)
+</code></pre>
+
+<p>
+  Palettes can be categorical (discrete colors) or continuous (color gradients).
+  You can also build your own with <code>sns.color_palette()</code> or use any Matplotlib colormap.
+</p>
+
+<h4>Context: adjust scale globally</h4>
+<pre><code class="language-python">
+sns.set_context("talk")      # larger fonts for presentations
+sns.set_context("paper")     # smaller fonts for compact figures
+</code></pre>
+
+<p>
+  Context scales fonts, line widths, and markers for different output formats —
+  essential when reusing the same code for papers, slides, or dashboards.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Use <code>sns.set_theme()</code> once at the start of a notebook or script —
+  it keeps your figures consistent without having to repeat styling in every call.
+  Combine style, palette, and context for a cohesive visual language.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://seaborn.pydata.org/tutorial/aesthetics.html" target="_blank">
+    Seaborn tutorial — Controlling figure aesthetics
+  </a>
+</p>
+

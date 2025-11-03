@@ -1,0 +1,74 @@
+<p>
+    In <strong>pandas</strong>, understanding the difference between a <code>Series</code>
+    and a <code>DataFrame</code> is essential.
+    A <strong>Series</strong> is a one-dimensional labeled array,
+    while a <strong>DataFrame</strong> is a two-dimensional table made up of multiple Series,
+    all aligned by their index.
+</p>
+
+<p>
+    You can think of a Series as a single <em>column</em> in Excel,
+    and a DataFrame as the entire <em>spreadsheet</em> — a collection of columns that share the same row labels.
+</p>
+
+<pre><code class="language-python">
+import pandas as pd
+
+# A Series: one labeled column
+s = pd.Series([10, 20, 30], name="values")
+print("Series:")
+print(s)
+print("Dimensions:", s.ndim, "| Shape:", s.shape)
+
+# A DataFrame: multiple columns aligned by index
+df = pd.DataFrame({
+    "A": [10, 20, 30],
+    "B": [1.1, 2.2, 3.3],
+    "C": ["x", "y", "z"]
+})
+print("\nDataFrame:")
+print(df)
+print("Dimensions:", df.ndim, "| Shape:", df.shape)
+</code></pre>
+
+<p>
+    Notice that the <code>Series</code> is one-dimensional (<code>ndim = 1</code>),
+    whereas the <code>DataFrame</code> is two-dimensional (<code>ndim = 2</code>).
+    Internally, each column of a DataFrame is a Series sharing the same index.
+</p>
+
+<h4>Common conversions</h4>
+<pre><code class="language-python">
+# Series ➜ DataFrame
+s_df = s.to_frame()
+print(type(s_df))
+
+# DataFrame ➜ Series (single column)
+col = df["A"]
+print(type(col))
+</code></pre>
+
+<p>
+    You can also extract the raw values with <code>.values</code>
+    or the more modern <code>.to_numpy()</code>, which returns a NumPy array.
+</p>
+
+<pre><code class="language-python">
+arr = df.to_numpy()
+print(arr.shape)
+print(arr)
+</code></pre>
+
+<h4>Practical tip 🧠</h4>
+<p>
+    Use a <code>Series</code> for single-variable data (for example, a signal,
+    a single measurement, or a simple time series).
+    Use a <code>DataFrame</code> when you’re working with multiple related variables or columns.
+</p>
+
+<p>
+    🔗 Reference:
+    <a href="https://pandas.pydata.org/docs/reference/index.html" target="_blank">
+    Official pandas documentation
+    </a>
+</p>

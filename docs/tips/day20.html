@@ -1,0 +1,105 @@
+<p>
+  Once your plot looks right on screen, the final step is saving it cleanly for reports, papers, or presentations.
+  <strong>Matplotlib</strong> lets you control figure size, resolution, and format precisely — so your visuals stay sharp anywhere.
+</p>
+
+<h4>Basic high-resolution export</h4>
+<pre><code class="language-python">
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 10, 200)
+y = np.sin(x) * np.exp(-0.1 * x)
+
+fig, ax = plt.subplots(figsize=(5, 3))  # size in inches (width, height)
+ax.plot(x, y, color="steelblue", lw=2)
+ax.set(xlabel="x", ylabel="y", title="High-Resolution Export")
+
+# Save at 300 DPI (print quality)
+fig.savefig("plot.png", dpi=300, bbox_inches="tight")
+</code></pre>
+
+<p>
+  <code>dpi</code> (dots per inch) controls sharpness — use <strong>300+</strong> for print, <strong>150</strong> for slides, and <strong>100</strong> for quick drafts.
+  <code>bbox_inches="tight"</code> trims extra whitespace around the figure.
+</p>
+
+<h4>Save in different formats</h4>
+<pre><code class="language-python">
+fig.savefig("plot.pdf")      # vector format, best for print
+fig.savefig("plot.svg")      # scalable web graphic
+fig.savefig("plot.jpg", quality=95)  # lossy but smaller
+fig.savefig("plot.tiff", dpi=600)    # for journal submissions
+</code></pre>
+
+<p>
+  Use <strong>vector formats</strong> (<code>.pdf</code>, <code>.svg</code>) for line art and text — they scale perfectly.
+  Use <strong>raster formats</strong> (<code>.png</code>, <code>.jpg</code>, <code>.tiff</code>) for photos or dense plots.
+</p>
+
+<h4>Programmatic control of size and layout</h4>
+<pre><code class="language-python">
+fig.set_size_inches(6, 4)
+fig.tight_layout(pad=0.2)
+
+# or directly in savefig (rare but handy)
+fig.savefig("plot.png", dpi=300, bbox_inches="tight", pad_inches=0.1)
+</code></pre>
+
+<p>
+  Adjusting size in inches ensures consistent scaling across formats.
+  <code>tight_layout()</code> and <code>pad_inches</code> help balance spacing around labels and titles.
+</p>
+
+<h4>Transparent and background options</h4>
+<pre><code class="language-python">
+# Transparent background (great for slides)
+fig.savefig("plot_transparent.png", dpi=300, transparent=True)
+
+# White background enforced
+fig.savefig("plot_whitebg.png", facecolor="white")
+</code></pre>
+
+<p>
+  Transparency works best in PNG and SVG formats.
+  Always test legibility on both light and dark backgrounds before sharing.
+</p>
+
+<h4>Batch saving multiple figures</h4>
+<pre><code class="language-python">
+for i, freq in enumerate([1, 2, 3], start=1):
+    fig, ax = plt.subplots()
+    ax.plot(x, np.sin(freq * x))
+    fig.savefig(f"plot_{i}.png", dpi=200, bbox_inches="tight")
+    plt.close(fig)   # free memory
+</code></pre>
+
+<p>
+  Looping through <code>savefig()</code> calls is efficient if you close each figure after saving —
+  otherwise you’ll slowly exhaust memory.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Choose your format based on the destination:
+</p>
+<ul>
+  <li><strong>PNG</strong> — presentations, websites (raster, transparent optional)</li>
+  <li><strong>PDF/SVG</strong> — papers, vector graphics (infinitely scalable)</li>
+  <li><strong>TIFF</strong> — journals that require print-ready images</li>
+</ul>
+<p>
+  Always test your saved figure by opening it outside Python — a figure that looks perfect in your notebook can get clipped or blurred if sizing and DPI aren’t matched.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html" target="_blank">
+    matplotlib.pyplot.savefig() documentation
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://matplotlib.org/stable/gallery/misc/transparent_legends.html" target="_blank">
+    Matplotlib gallery — Saving figures with transparency
+  </a>
+</p>
+

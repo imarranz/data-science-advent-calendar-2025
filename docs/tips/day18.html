@@ -1,0 +1,105 @@
+ <p>
+  Data rarely arrives in the shape you need.
+  <strong>Pivot</strong> and <strong>melt</strong> are complementary reshaping tools in <strong>pandas</strong>:
+  <code>pivot</code> makes data wider (columns from values),
+  while <code>melt</code> makes it longer (values stacked into rows).
+</p>
+
+<h4>From long → wide with <code>pivot</code></h4>
+<pre><code class="language-python">
+import pandas as pd
+
+df = pd.DataFrame({
+    "day": ["Mon","Mon","Tue","Tue"],
+    "city": ["Bilbao","Barcelona","Bilbao","Barcelona"],
+    "temp": [14, 20, 15, 22]
+})
+print(df)
+</code></pre>
+
+<pre><code class="language-text">
+     day    city  temp
+0    Mon  Bilbao    14
+1    Mon  Barcelona    20
+2    Tue  Bilbao    15
+3    Tue  Barcelona    22
+</code></pre>
+
+<pre><code class="language-python">
+# Pivot: cities become columns, days become index
+wide = df.pivot(index="day", columns="city", values="temp")
+print(wide)
+</code></pre>
+
+<pre><code class="language-text">
+city  Bilbao  Barcelona
+day
+Mon       14      20
+Tue       15      22
+</code></pre>
+
+<p>
+  <code>pivot</code> fails if the combination of index and columns isn’t unique —
+  in that case, use <code>pivot_table</code> to aggregate duplicates safely.
+</p>
+
+<pre><code class="language-python">
+pd.pivot_table(df, index="day", columns="city", values="temp", aggfunc="mean")
+</code></pre>
+
+<h4>From wide → long with <code>melt</code></h4>
+<pre><code class="language-python">
+# Melt back to long format
+long = wide.reset_index().melt(id_vars="day", var_name="city", value_name="temp")
+print(long)
+</code></pre>
+
+<pre><code class="language-text">
+     day    city  temp
+0    Mon  Bilbao    14
+1    Tue  Bilbao    15
+2    Mon  Barcelona    20
+3    Tue  Barcelona    22
+</code></pre>
+
+<p>
+  Use <code>id_vars</code> for columns you want to keep fixed, and
+  <code>var_name</code>/<code>value_name</code> to rename the stacked columns.
+</p>
+
+<h4>Stack & unstack — same spirit, index-based</h4>
+<pre><code class="language-python">
+# Similar to pivot/melt but works on MultiIndex
+stacked = wide.stack()
+unstacked = stacked.unstack()
+</code></pre>
+
+<p>
+  <code>stack</code> collapses columns into a new inner index;
+  <code>unstack</code> expands an index level back into columns.
+</p>
+
+<h4>Real-world tip 🧠</h4>
+<ul>
+  <li><strong>Use pivot_table</strong> when keys repeat; <code>pivot</code> assumes uniqueness.</li>
+  <li><strong>Melt</strong> is your friend when feeding tidy data to plotting libraries (like Seaborn).</li>
+  <li>Combine with <code>rename()</code> and <code>sort_values()</code> to produce clean, readable layouts.</li>
+  <li><strong>Stack/unstack</strong> are lower-level and perfect for MultiIndex reshaping in pipelines.</li>
+</ul>
+
+<h4>Cheat sheet</h4>
+<pre><code class="language-text">
+pivot        → long → wide (columns from values)
+pivot_table  → same, with aggregation
+melt         → wide → long (rows from columns)
+stack/unstack → reshape MultiIndex levels
+</code></pre>
+
+<p>
+  🔗 References:
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.pivot.html" target="_blank">pandas.DataFrame.pivot()</a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.melt.html" target="_blank">pandas.melt()</a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/user_guide/reshaping.html" target="_blank">Reshaping and pivot tables</a>
+</p>

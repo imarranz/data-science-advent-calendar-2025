@@ -1,0 +1,62 @@
+<p>
+  Reading data efficiently is the first step of any analysis.
+  In <strong>pandas</strong>, the workhorse function is <code>read_csv()</code>, which loads delimited text files into a <code>DataFrame</code>.
+</p>
+
+<pre><code class="language-python">
+import pandas as pd
+
+# Basic usage
+df = pd.read_csv("data.csv")
+
+# Quick look at the table
+print(df.head(3))   # first 3 rows
+print(df.tail(3))   # last 3 rows
+print(df.info())    # structure and data types
+</code></pre>
+
+<p>
+  By default, pandas assumes comma-separated values and tries to infer types automatically.
+  You can control the delimiter, column names, and missing-value handling with optional arguments.
+</p>
+
+<h4>Useful parameters</h4>
+<pre><code class="language-python">
+# Custom delimiter and header row
+df = pd.read_csv("data.tsv", sep="\t", header=0)
+
+# Specify column names manually
+cols = ["name", "age", "city"]
+df = pd.read_csv("people.csv", names=cols, header=None)
+
+# Limit how many rows are read (great for big files)
+sample = pd.read_csv("big.csv", nrows=1000)
+
+# Handle missing values and encodings
+df = pd.read_csv("data.csv", na_values=["NA", "?"], encoding="utf-8")
+</code></pre>
+
+<p>
+  After loading, you can inspect the structure with:
+</p>
+
+<pre><code class="language-python">
+df.shape        # (rows, columns)
+df.columns      # column labels
+df.describe()   # quick numeric summary
+</code></pre>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  When you receive a suspiciously large or messy CSV, load a small sample first with
+  <code>nrows</code> or <code>skiprows</code> to test your parsing options before loading the full dataset.
+  This saves time — and sanity.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html" target="_blank">
+    pandas.read_csv() documentation
+  </a>
+</p>
+

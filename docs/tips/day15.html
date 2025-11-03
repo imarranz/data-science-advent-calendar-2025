@@ -1,0 +1,102 @@
+<p>
+  Quick EDA (Exploratory Data Analysis) means getting signal fast: shapes, types, missingness, basic stats, and a feel for pairwise relationships.
+  This combo gives you a dependable first pass in seconds.
+</p>
+
+<h4>Structural overview</h4>
+<pre><code class="language-python">
+# Dimensions, column names, dtypes, and non-null counts
+print(df.shape)     # (rows, columns)
+print(df.columns)   # Index([...])
+df.info()           # dtypes + non-null counts (great for missingness)
+</code></pre>
+
+<h4>Descriptive statistics</h4>
+<pre><code class="language-python">
+# Numeric & categorical summary
+summary = df.describe(include="all", datetime_is_numeric=True)
+print(summary)
+</code></pre>
+
+<p>
+  <code>describe()</code> gives count/mean/std for numeric columns and freq/top for categoricals.
+  If you have datetimes, <code>datetime_is_numeric=True</code> treats them as numbers (useful for ranges).
+</p>
+
+<h4>Quick distribution check</h4>
+<pre><code class="language-python">
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+num = df.select_dtypes("number")
+
+# Histograms for all numeric columns (compact loop)
+for col in num.columns:
+    sns.histplot(num[col], kde=True)
+    plt.title(f"Distribution — {col}")
+    plt.show()
+</code></pre>
+
+<h4>Correlation sneak peek</h4>
+<pre><code class="language-python">
+# Pairwise correlations (numeric only)
+corr = num.corr(numeric_only=True)  # on recent pandas, 'numeric_only' is implicit
+print(corr.round(3))
+
+# Optional heatmap
+sns.heatmap(corr, annot=False, cmap="viridis", center=0)
+plt.title("Correlation (numeric)")
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<h4>Pairwise relationships at a glance</h4>
+<pre><code class="language-python">
+# Pairplot: small multiples for scatter + hist
+# 'corner=True' shows only the lower triangle (cleaner);
+# 'plot_kws' keeps points readable
+sns.pairplot(num, corner=True, diag_kind="hist",
+             plot_kws={"alpha": 0.6, "s": 25, "edgecolor": "none"})
+plt.show()
+</code></pre>
+
+<p>
+  For mixed data with categories, coloring by a grouping variable can reveal separations:
+</p>
+
+<pre><code class="language-python">
+# If you have a categorical "target" or "group"
+if "target" in df.columns:
+    sns.pairplot(df.select_dtypes("number").assign(target=df["target"]),
+                 hue="target", corner=True, diag_kind="hist",
+                 plot_kws={"alpha": 0.6, "s": 25})
+    plt.show()
+</code></pre>
+
+<h4>Performance & practicality 🧠</h4>
+<ul>
+  <li><strong>Large data?</strong> Sample first: <code>df.sample(5000, random_state=0)</code> before <code>pairplot</code>.</li>
+  <li><strong>High-cardinality categoricals?</strong> Use <code>value_counts()</code> on top suspects to understand tail behavior.</li>
+  <li><strong>Dtypes matter:</strong> fix integers stored as strings and parse dates early (<code>pd.to_datetime</code>).</li>
+  <li><strong>Memory check:</strong> <code>df.memory_usage(deep=True).sum()</code> to see if you need downcasting.</li>
+</ul>
+
+<h4>Tiny “all-in” snippet</h4>
+<pre><code class="language-python">
+num = df.select_dtypes("number")
+print(df.shape); df.info()
+display(df.describe(include="all", datetime_is_numeric=True))
+sns.heatmap(num.corr(), cmap="viridis", center=0); plt.show()
+sns.pairplot(num.sample(min(len(num), 3000), random_state=0), corner=True,
+             plot_kws={"alpha": .6, "s": 20}); plt.show()
+</code></pre>
+
+<p>
+  🔗 References:
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.describe.html" target="_blank">pandas.DataFrame.describe()</a>
+  &nbsp;|&nbsp;
+  <a href="https://seaborn.pydata.org/generated/seaborn.pairplot.html" target="_blank">seaborn.pairplot()</a>
+  &nbsp;|&nbsp;
+  <a href="https://seaborn.pydata.org/generated/seaborn.heatmap.html" target="_blank">seaborn.heatmap()</a>
+</p>
+

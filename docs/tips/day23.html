@@ -1,0 +1,121 @@
+<p>
+  Categorical variables — strings or discrete labels — are everywhere.
+  <strong>pandas</strong> provides efficient ways to store, inspect, and encode them for both analysis and modeling.
+</p>
+
+<h4>Convert to categorical dtype</h4>
+<pre><code class="language-python">
+import pandas as pd
+
+df = pd.DataFrame({
+    "city": ["Bilbao", "Madrid", "Bilbao", "Sevilla", "Madrid", "Bilbao"],
+    "sales": [10, 12, 9, 15, 7, 11]
+})
+
+df["city"] = df["city"].astype("category")
+print(df["city"].cat.categories)
+print(df.info())
+</code></pre>
+
+<p>
+  <code>astype("category")</code> stores repeated strings as integer codes under the hood —
+  often reducing memory use by over 80%.
+  You can inspect the category levels via <code>.cat.categories</code>.
+</p>
+
+<h4>Access integer codes</h4>
+<pre><code class="language-python">
+codes = df["city"].cat.codes
+print(codes.head())
+</code></pre>
+
+<p>
+  Each category maps to a numeric code.
+  This can be handy for simple models or debugging, but not all algorithms handle codes as categorical by default — many treat them as ordered numbers.
+</p>
+
+<h4>Define or reorder categories</h4>
+<pre><code class="language-python">
+# Set an explicit order
+df["city"] = df["city"].cat.reorder_categories(
+    ["Bilbao", "Madrid", "Sevilla"], ordered=True
+)
+
+# Sort or compare based on order
+df = df.sort_values("city")
+print(df["city"].head())
+</code></pre>
+
+<p>
+  Defining an order turns categories into ordinal data — useful for things like education levels or time bins.
+  Comparisons (<code>&lt;</code>, <code>&gt;</code>) will then follow this defined order.
+</p>
+
+<h4>One-hot encoding (dummy variables)</h4>
+<pre><code class="language-python">
+X = pd.get_dummies(df, columns=["city"], drop_first=True)
+print(X.head())
+</code></pre>
+
+<pre><code class="language-text">
+   sales  city_Madrid  city_Sevilla
+0     10            0             0
+1     12            1             0
+2      9            0             0
+3     15            0             1
+4      7            1             0
+</code></pre>
+
+<p>
+  One-hot encoding converts each category into its own binary column.
+  <code>drop_first=True</code> avoids collinearity by dropping one reference level.
+</p>
+
+<h4>Memory & performance comparison</h4>
+<pre><code class="language-python">
+df_raw = pd.DataFrame({"city": ["Bilbao", "Madrid", "Sevilla"] * 100_000})
+print("String dtype memory:", df_raw.memory_usage(deep=True).sum())
+
+df_cat = df_raw.astype({"city": "category"})
+print("Categorical dtype memory:", df_cat.memory_usage(deep=True).sum())
+</code></pre>
+
+<p>
+  The categorical version can use less than 10% of the memory of the raw string version —
+  essential when handling millions of rows.
+</p>
+
+<h4>Multiple categorical columns</h4>
+<pre><code class="language-python">
+cat_cols = ["city", "region", "type"]
+df[cat_cols] = df[cat_cols].astype("category")
+
+X = pd.get_dummies(df, columns=cat_cols, drop_first=True)
+</code></pre>
+
+<p>
+  Converting several columns at once keeps your preprocessing pipeline consistent and efficient.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Use <code>category</code> dtype early for memory savings and faster <code>groupby</code> or <code>value_counts</code>.
+  For modeling, prefer <code>get_dummies()</code> (or <code>pd.Categorical.codes</code> if your model supports integers).
+  Keep category names descriptive — once encoded, only you will know what <code>city_Madrid</code> used to mean.
+</p>
+
+<p>
+  🔗 References:
+  <a href="https://pandas.pydata.org/docs/user_guide/categorical.html" target="_blank">
+    pandas user guide — Categorical data
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.get_dummies.html" target="_blank">
+    pandas.get_dummies()
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.Categorical.html" target="_blank">
+    pandas.Categorical
+  </a>
+</p>
+

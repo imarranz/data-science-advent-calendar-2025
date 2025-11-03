@@ -1,0 +1,74 @@
+ <p>
+  In <strong>pandas</strong>, <code>.loc</code> and <code>.iloc</code> are the two main ways to select subsets of your data.
+  The key difference is how they interpret your indexing:
+</p>
+
+<ul>
+  <li><code>.loc</code> uses <strong>labels</strong> — the names or index values of rows and columns.</li>
+  <li><code>.iloc</code> uses <strong>integer positions</strong> — the zero-based row and column numbers.</li>
+</ul>
+
+<h4>Example dataset</h4>
+<pre><code class="language-python">
+import pandas as pd
+
+df = pd.DataFrame(
+    {"A": [10, 20, 30, 40],
+     "B": [1.1, 2.2, 3.3, 4.4],
+     "C": ["x", "y", "z", "w"]},
+    index=["r1", "r2", "r3", "r4"]
+)
+
+print(df)
+</code></pre>
+
+<h4>Using <code>.loc</code> → label-based selection</h4>
+<pre><code class="language-python">
+# Select rows by label, columns by label
+df.loc["r1":"r3", ["A", "C"]]
+
+# Single cell by label
+df.loc["r2", "B"]
+
+# Conditional filtering
+df.loc[df["A"] > 20, ["A", "B"]]
+</code></pre>
+
+<h4>Using <code>.iloc</code> → position-based selection</h4>
+<pre><code class="language-python">
+# Select rows 0–2, columns 0–1 (note: Python slicing is exclusive at the end)
+df.iloc[0:3, 0:2]
+
+# Single cell by numeric position
+df.iloc[1, 1]   # same as df.loc["r2", "B"]
+
+# Last row
+df.iloc[-1]
+</code></pre>
+
+<p>
+  A common beginner mistake is to assume <code>.loc</code> works like Python’s slice notation.
+  It doesn’t: <code>.loc</code> includes both endpoints, while <code>.iloc</code> behaves like regular Python slicing (excluding the stop index).
+</p>
+
+<pre><code class="language-python">
+# Includes both "r1" and "r2"
+df.loc["r1":"r2"]
+
+# Excludes position 2 (returns rows 0 and 1 only)
+df.iloc[0:2]
+</code></pre>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Use <code>.loc</code> when you care about the labels (for clarity and fewer off-by-one errors),
+  and <code>.iloc</code> when you’re iterating or slicing by position.
+  Mixing them carelessly is a recipe for subtle bugs.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://pandas.pydata.org/docs/user_guide/indexing.html#different-choices-for-indexing" target="_blank">
+    Pandas user guide: indexing and selecting data
+  </a>
+</p>

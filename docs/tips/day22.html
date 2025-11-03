@@ -1,0 +1,101 @@
+<p>
+  When your data has timestamps, turning them into a <strong>DatetimeIndex</strong> unlocks automatic sorting, slicing, and resampling by any time frequency.
+  <strong>pandas</strong> makes time-aware operations effortless.
+</p>
+
+<h4>Convert and set a datetime index</h4>
+<pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+# Example: hourly data
+rng = pd.date_range("2025-01-01", periods=48, freq="H")
+df = pd.DataFrame({
+    "ts": rng,
+    "value": np.random.randn(len(rng)).cumsum()
+})
+
+# Convert and set datetime index
+df["ts"] = pd.to_datetime(df["ts"])
+ts = df.set_index("ts").sort_index()
+print(ts.head())
+</code></pre>
+
+<p>
+  Setting <code>DatetimeIndex</code> allows you to use rich time-based indexing like <code>ts["2025-01-02"]</code> or <code>ts["2025-01-01 12h":"2025-01-01 18h"]</code>.
+</p>
+
+<h4>Resample to new frequencies</h4>
+<pre><code class="language-python">
+# Daily mean values
+daily = ts.resample("D")["value"].mean()
+
+# Weekly total
+weekly = ts.resample("W")["value"].sum()
+
+# 15-minute average (up-sampling)
+quarter_hour = ts.resample("15T")["value"].interpolate()
+</code></pre>
+
+<p>
+  <code>resample()</code> groups data into fixed time bins.
+  The frequency codes follow Pandas’ offset aliases:
+  <code>"D"</code> (day), <code>"W"</code> (week), <code>"M"</code> (month), <code>"H"</code> (hour), <code>"T"</code> (minute), etc.
+</p>
+
+<h4>Rolling and time-based windows</h4>
+<pre><code class="language-python">
+# 3-day moving average (window by time)
+ts["smooth"] = ts["value"].rolling("3D").mean()
+
+# Rolling by number of rows
+ts["rolling_5"] = ts["value"].rolling(5).mean()
+</code></pre>
+
+<p>
+  When the index is datetime, rolling windows can be defined in actual time durations like <code>"3D"</code> or <code>"12H"</code>, not just row counts.
+</p>
+
+<h4>Resample with multiple aggregations</h4>
+<pre><code class="language-python">
+stats = ts.resample("D")["value"].agg(["mean", "max", "min", "count"])
+print(stats.head())
+</code></pre>
+
+<p>
+  Aggregating multiple statistics gives compact daily summaries, useful for dashboards or feature engineering.
+</p>
+
+<h4>Handling missing time points</h4>
+<pre><code class="language-python">
+# Reindex to ensure full calendar coverage
+full = ts.reindex(pd.date_range(ts.index.min(), ts.index.max(), freq="H"))
+full["value"] = full["value"].interpolate()
+</code></pre>
+
+<p>
+  <code>reindex()</code> plus interpolation ensures consistent time spacing even with missing records — critical for modeling and plotting.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Always <code>sort_index()</code> after setting a datetime index — resampling and slicing assume chronological order.
+  Use <code>resample("M")</code> for calendar grouping and <code>rolling("7D")</code> for smoothing.
+  pandas time tools handle daylight saving, leap years, and all the messy bits so you don’t have to.
+</p>
+
+<p>
+  🔗 References:
+  <a href="https://pandas.pydata.org/docs/user_guide/timeseries.html" target="_blank">
+    pandas user guide — Time series / date functionality
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.resample.html" target="_blank">
+    pandas.DataFrame.resample()
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.rolling.html" target="_blank">
+    pandas.DataFrame.rolling()
+  </a>
+</p>
+

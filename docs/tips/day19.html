@@ -1,0 +1,100 @@
+<p>
+  A clear title, axis labels, and well-placed annotations make your plot ready for presentation or publication.
+  In <strong>Matplotlib</strong>, you can customize every element — text, spacing, and arrows — to guide the reader’s eye.
+</p>
+
+<h4>Basic labeled plot</h4>
+<pre><code class="language-python">
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 10, 200)
+y = np.sin(x) * np.exp(-0.1 * x)
+
+fig, ax = plt.subplots()
+ax.plot(x, y, color="steelblue", lw=2)
+
+# Axis labels and title
+ax.set(
+    xlabel="Time (s)",
+    ylabel="Amplitude",
+    title="Damped Sine Wave"
+)
+
+fig.tight_layout()
+plt.show()
+</code></pre>
+
+<p>
+  <code>ax.set()</code> is a shorthand for setting multiple attributes at once.
+  <code>tight_layout()</code> prevents titles and labels from being cropped.
+</p>
+
+<h4>Adding annotations</h4>
+<pre><code class="language-python">
+# Annotate a local maximum
+x0 = x[np.argmax(y)]
+y0 = y.max()
+
+ax.annotate(
+    "Peak",
+    xy=(x0, y0),             # point to annotate
+    xytext=(x0 + 1, y0 + 0.2),  # label position
+    arrowprops=dict(arrowstyle="->", lw=1.2, color="gray"),
+    fontsize=10,
+    ha="left"
+)
+</code></pre>
+
+<p>
+  <code>annotate()</code> places text relative to a data point and can draw arrows between the two.
+  Arrows and alignment (<code>ha</code>, <code>va</code>) keep labels readable and professional.
+</p>
+
+<h4>Multiple text styles</h4>
+<pre><code class="language-python">
+# Inline text
+ax.text(2, 0.5, "Transient phase", fontsize=9, color="darkred")
+
+# Figure-level title
+fig.suptitle("Experiment A — Signal decay", fontsize=13, fontweight="bold")
+</code></pre>
+
+<p>
+  Use <code>ax.text()</code> for free placement and <code>fig.suptitle()</code> for an overall title above all subplots.
+</p>
+
+<h4>Fine-tuning fonts and spacing</h4>
+<pre><code class="language-python">
+plt.rcParams.update({
+    "font.size": 10,
+    "axes.titlesize": 12,
+    "axes.labelsize": 10,
+    "figure.titlesize": 13,
+})
+
+# Adjust white space for dense figures
+plt.subplots_adjust(top=0.9, bottom=0.1, left=0.1, right=0.95)
+</code></pre>
+
+<p>
+  <code>rcParams</code> sets global style defaults — perfect for consistent figure sets in reports or papers.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Titles describe the “what,” labels describe the “axes,” and annotations explain the “why.”
+  Keep text concise, align consistently, and annotate sparingly — one good arrow beats five vague ones.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://matplotlib.org/stable/gallery/text_labels_and_annotations/annotation_demo.html" target="_blank">
+    Matplotlib — Annotations and text
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.annotate.html" target="_blank">
+    Axes.annotate() documentation
+  </a>
+</p>
+

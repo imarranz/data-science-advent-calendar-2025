@@ -1,0 +1,100 @@
+<p>
+  In <strong>pandas</strong>, use <code>concat</code> to stack tables, and <code>merge/join</code> to align rows by keys.
+  Think: <em>concat = glue along an axis</em>; <em>merge = relational join</em>.
+</p>
+
+<h4>Concatenate — stack rows or columns</h4>
+<pre><code class="language-python">
+import pandas as pd
+
+df1 = pd.DataFrame({"id":[1,2], "a":[10,20]})
+df2 = pd.DataFrame({"id":[3,4], "a":[30,40]})
+
+# Stack rows (axis=0). Use ignore_index to re-number.
+rows = pd.concat([df1, df2], axis=0, ignore_index=True)
+
+# Stack columns (axis=1) — aligns by index
+c1 = pd.DataFrame({"x":[1,2,3]}, index=[0,1,2])
+c2 = pd.DataFrame({"y":[10,20]}, index=[0,2])
+cols = pd.concat([c1, c2], axis=1)   # row 1 gets NaN in y
+
+# Track origin with keys (MultiIndex on rows)
+tagged = pd.concat({"part1": df1, "part2": df2})
+</code></pre>
+
+<p>
+  Use <code>concat</code> when schemas match and you just need to pile up records or align columns side-by-side by index.
+</p>
+
+<h4>Merge — align by key(s)</h4>
+<pre><code class="language-python">
+left = pd.DataFrame({"id":[1,2,3], "city":["Bilbao","Madrid","Sevilla"]})
+right = pd.DataFrame({"id":[1,1,2], "sales":[100,150,200]})
+
+# INNER: rows where keys appear in both
+m_inner = pd.merge(left, right, on="id", how="inner")
+
+# LEFT: keep all left rows; fill from right
+m_left = pd.merge(left, right, on="id", how="left")
+
+# RIGHT / OUTER also available
+m_outer = pd.merge(left, right, on="id", how="outer", indicator=True)
+</code></pre>
+
+<p>
+  <code>indicator=True</code> adds a column showing where each row came from (<code>left_only</code>, <code>right_only</code>, <code>both</code>) — great for sanity checks.
+</p>
+
+<h4>Joining on different column names & multiple keys</h4>
+<pre><code class="language-python">
+users = pd.DataFrame({"user_id":[1,2], "country":["ES","FR"]})
+events = pd.DataFrame({"uid":[1,1,2], "ts":[1,2,3]})
+
+pd.merge(users, events, left_on="user_id", right_on="uid", how="left")
+
+# Multi-key join
+pd.merge(df1, df2, on=["id","day"], how="inner")
+</code></pre>
+
+<h4>Join by index</h4>
+<pre><code class="language-python">
+L = pd.DataFrame({"a":[1,2,3]}, index=["r1","r2","r3"])
+R = pd.DataFrame({"b":[10,20]}, index=["r1","r3"])
+
+# .join() defaults to index alignment
+L.join(R, how="left")        # same as merge(left_index=True, right_index=True)
+</code></pre>
+
+<h4>Protect against bad joins</h4>
+<pre><code class="language-python">
+# Ensure one-to-one or one-to-many relationships
+pd.merge(left, right, on="id", validate="one_to_many")
+
+# Disambiguate overlapping column names
+pd.merge(left, right, on="id", suffixes=("_L", "_R"))
+</code></pre>
+
+<h4>Performance & correctness tips 🧠</h4>
+<ul>
+  <li><strong>Concat:</strong> prefer building a list and one final <code>pd.concat(list)</code> over repeated <code>append</code> in a loop.</li>
+  <li><strong>Merge keys:</strong> set dtypes consistently (<code>int32</code> vs <code>int64</code> vs <code>string</code>) to avoid silent mismatches.</li>
+  <li><strong>Many-to-many:</strong> merges explode row counts; use <code>validate="m:m"</code> deliberately and check sizes.</li>
+  <li><strong>Index joins:</strong> if the natural key is the index, <code>.join</code> is tidy and fast.</li>
+</ul>
+
+<h4>Cheat sheet</h4>
+<pre><code class="language-text">
+concat (axis=0)  → stack more rows of the same schema
+concat (axis=1)  → align by index, add more columns
+merge/join       → relational alignment by keys (like SQL)
+</code></pre>
+
+<p>
+  🔗 References:
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.concat.html" target="_blank">pandas.concat()</a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.merge.html" target="_blank">pandas.merge()</a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.join.html" target="_blank">DataFrame.join()</a>
+</p>
+

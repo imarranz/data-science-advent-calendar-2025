@@ -1,0 +1,85 @@
+<p>
+  A well-placed legend turns a good plot into a clear one.
+  In <strong>Matplotlib</strong>, the legend can be styled and positioned precisely — just like any other plot element.
+</p>
+
+<h4>Basic example</h4>
+<pre><code class="language-python">
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 10, 200)
+y1 = np.sin(x)
+y2 = np.cos(x)
+
+fig, ax = plt.subplots()
+ax.plot(x, y1, label="sin(x)")
+ax.plot(x, y2, label="cos(x)")
+
+ax.legend(frameon=False, title="Functions",
+          bbox_to_anchor=(1.02, 1), loc="upper left")
+
+ax.set_xlabel("x")
+ax.set_ylabel("value")
+ax.set_title("Elegant Legend Example")
+
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+<p>
+  This places the legend outside the plot area, aligned to the upper left, without a frame.
+  The <code>bbox_to_anchor</code> argument controls the exact anchor point (here, slightly outside the axes).
+</p>
+
+<h4>Styling options</h4>
+<pre><code class="language-python">
+# Legend with frame and custom style
+ax.legend(
+    title="Series",
+    frameon=True,
+    facecolor="white",
+    edgecolor="gray",
+    fontsize=10,
+    title_fontsize=11,
+    loc="upper right"
+)
+</code></pre>
+
+<p>
+  You can change font sizes, colors, alignment, and more.
+  Setting <code>frameon=False</code> removes the box, while <code>ncol=2</code> spreads items across columns.
+</p>
+
+<pre><code class="language-python">
+ax.legend(ncol=2, loc="lower center", bbox_to_anchor=(0.5, -0.2))
+</code></pre>
+
+<h4>Multiple lines and automatic labels</h4>
+<pre><code class="language-python">
+# Automatically use labels from plotted lines
+for freq in [1, 2, 3]:
+    ax.plot(x, np.sin(freq * x), label=f"{freq} Hz")
+
+ax.legend(title="Frequency", ncol=3, frameon=False)
+</code></pre>
+
+<p>
+  Matplotlib collects all lines with a <code>label</code> argument and includes them automatically.
+  To skip a line in the legend, set <code>label="_nolegend_"</code>.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Keep legends minimal — clarity beats decoration.
+  If the legend overlaps your data, move it outside or use <code>loc="best"</code> to let Matplotlib choose an optimal placement.
+  And remember: color, not clutter, should carry the meaning.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.legend.html" target="_blank">
+    matplotlib.pyplot.legend() documentation
+  </a>
+</p>
+

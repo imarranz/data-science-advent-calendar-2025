@@ -1,0 +1,80 @@
+<p>
+  A <strong>scatter plot</strong> with a regression line is one of the quickest ways to explore relationships between variables.
+  <strong>Seaborn</strong> makes it easy to visualize both the trend and its uncertainty in a single command.
+</p>
+
+<h4>Basic regression plot</h4>
+<pre><code class="language-python">
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+# Example data
+np.random.seed(0)
+x = np.linspace(0, 10, 100)
+y = 2 * x + 1 + np.random.randn(100) * 2
+df = pd.DataFrame({"x": x, "y": y})
+
+sns.regplot(data=df, x="x", y="y", ci=95,
+            scatter_kws={"s": 30, "alpha": 0.7, "color": "steelblue"},
+            line_kws={"color": "darkorange", "lw": 2})
+
+plt.title("Scatter + Regression with Confidence Band")
+plt.show()
+</code></pre>
+
+<p>
+  The regression line shows the estimated linear trend;
+  the shaded region represents a <code>95%</code> confidence interval around that fit.
+</p>
+
+<h4>Customize the model and fit</h4>
+<pre><code class="language-python">
+# Disable confidence interval
+sns.regplot(data=df, x="x", y="y", ci=None)
+
+# Use a polynomial fit instead of linear
+sns.regplot(data=df, x="x", y="y", order=2)
+
+# Log-transform the x-axis before fitting
+sns.regplot(data=df, x=np.log(df["x"] + 1), y="y")
+</code></pre>
+
+<p>
+  Seaborn uses <code>scipy.stats.linregress</code> under the hood for simple linear regression.
+  For more complex models (like logistic or nonparametric fits), use <code>sns.lmplot()</code> or <code>sns.regplot(..., logistic=True)</code>.
+</p>
+
+<h4>Multiple groups</h4>
+<pre><code class="language-python">
+# Multiple categories → use hue for grouped regression
+df["group"] = np.random.choice(["A", "B"], size=len(df))
+
+sns.lmplot(data=df, x="x", y="y", hue="group",
+           palette="Set2", height=4, aspect=1.2)
+</code></pre>
+
+<p>
+  Each group gets its own regression line and confidence band.
+  <code>lmplot()</code> creates a new figure and supports grouping, faceting, and easy layout.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Use regression plots for quick exploratory insight, not final modeling.
+  They’re great for detecting linearity, outliers, and heteroscedasticity (unequal variance).
+  Once you spot a pattern, confirm it with a proper statistical model.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://seaborn.pydata.org/generated/seaborn.regplot.html" target="_blank">
+    seaborn.regplot() documentation
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://seaborn.pydata.org/generated/seaborn.lmplot.html" target="_blank">
+    seaborn.lmplot() documentation
+  </a>
+</p>
+

@@ -1,0 +1,121 @@
+ 
+<p>
+  Big CSVs are slow because of disk IO and type inference.
+  Speed comes from reading <em>less</em>, being explicit about types, and processing in <em>chunks</em>.
+</p>
+
+<h4>Fast & lean CSV loading</h4>
+<pre><code class="language-python">
+import pandas as pd
+
+# Read only needed columns and set explicit dtypes
+df = pd.read_csv(
+    "big.csv",
+    usecols=["id", "country", "amount", "ts"],
+    dtype={"id": "int32", "country": "category", "amount": "float32"},
+    parse_dates=["ts"],       # parse once, not later
+    infer_datetime_format=True,   # cheaper datetime parsing
+    na_values=["", "NA", "null"],
+    on_bad_lines="skip"       # don't choke on a single bad row
+)
+</code></pre>
+
+<p>
+  <code>usecols</code> cuts IO up front, explicit <code>dtype</code> avoids slow inference, and <code>category</code> shrinks low-cardinality strings dramatically.
+</p>
+
+<h4>Process by chunks (streaming)</h4>
+<pre><code class="language-python">
+totals = []
+
+for chunk in pd.read_csv(
+        "big.csv",
+        usecols=["country", "amount"],
+        dtype={"country":"category", "amount":"float32"},
+        chunksize=100_000):
+    grp = (chunk
+           .dropna(subset=["amount"])
+           .groupby("country", observed=True)["amount"]
+           .sum())
+    totals.append(grp)
+
+result = pd.concat(totals).groupby(level=0).sum().sort_values(ascending=False)
+print(result.head())
+</code></pre>
+
+<p>
+  Chunking scales linearly and keeps memory flat.
+  Using <code>observed=True</code> avoids expanding unused category levels.
+</p>
+
+<h4>Two-pass strategy for robust dtypes</h4>
+<pre><code class="language-python">
+# Pass 1: sample to guess safe dtypes
+sample = pd.read_csv("big.csv", nrows=50_000)
+dtypes = {
+    "id": "Int32",     # nullable integer
+    "amount": "Float32"
+}
+# Optional: cast categories based on frequency
+if sample["country"].nunique() / len(sample) &lt; 0.5:
+    dtypes["country"] = "category"
+
+# Pass 2: read full file with chosen dtypes
+df = pd.read_csv("big.csv", dtype=dtypes, usecols=["id","country","amount","ts"])
+</code></pre>
+
+<p>
+  The sample tells you if integers need nullable types (<code>Int32</code>) and which columns deserve <code>category</code>.
+</p>
+
+<h4>Post-load downcasting</h4>
+<pre><code class="language-python">
+# Aggressive but safe numeric shrinking
+for col in df.select_dtypes("number"):
+    df[col] = pd.to_numeric(df[col], downcast="integer")  # or "float"
+</code></pre>
+
+<p>
+  Downcasting after load can cut memory by 2–4× with no loss of intent.
+</p>
+
+<h4>Cache for future runs (huge win)</h4>
+<pre><code class="language-python">
+# After first clean read, cache once:
+df.to_parquet("big.parquet", index=False)  # columnar, compressed, typed
+
+# Next time: instantly fast
+df = pd.read_parquet("big.parquet")
+</code></pre>
+
+<p>
+  Parquet (or Feather) makes repeated work dramatically faster and smaller on disk.
+</p>
+
+<h4>Vectorize, don’t loop</h4>
+<pre><code class="language-python">
+# Avoid row-wise .apply. Prefer vectorized ops or groupby-agg.
+df["net"] = df["amount"] - df["fee"]
+summary = df.groupby("country", observed=True)["net"].agg(["mean","sum","count"])
+</code></pre>
+
+<p>
+  Vectorization uses C/numexpr paths. Row-wise Python loops are silent performance killers.
+</p>
+
+<h4>Practical tips 🧠</h4>
+<ul>
+  <li><strong>IO matters:</strong> Keep files compressed on disk (<code>.gz</code>) and let pandas decompress on the fly.</li>
+  <li><strong>Network files:</strong> Copy locally first or stream in chunks; network latency multiplies pain.</li>
+  <li><strong>Dates:</strong> Parse on read with <code>parse_dates</code>; retrofitting is slower.</li>
+  <li><strong>Diagnostics:</strong> <code>df.memory_usage(deep=True).sum()</code> and <code>df.info()</code> after each step.</li>
+</ul>
+
+<p>
+  🔗 References:
+  <a href="https://pandas.pydata.org/docs/user_guide/io.html#io-read-csv-table" target="_blank">pandas — CSV IO</a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/user_guide/scale.html" target="_blank">pandas — Scaling to large datasets</a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/user_guide/io.html#parquet" target="_blank">pandas — Parquet</a>
+</p>

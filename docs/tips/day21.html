@@ -1,0 +1,101 @@
+ <p>
+  When exploring categorical or discrete columns, knowing <em>what</em> values appear and <em>how often</em> they occur is step one.
+  In <strong>pandas</strong>, <code>unique()</code> and <code>value_counts()</code> make that inspection instant.
+</p>
+
+<h4>Basic usage</h4>
+<pre><code class="language-python">
+import pandas as pd
+
+df = pd.DataFrame({
+    "city": ["Bilbao", "Madrid", "Bilbao", "Sevilla", "Madrid", None],
+    "sales": [10, 12, 9, 15, 7, 8]
+})
+
+# Distinct values (including NaN)
+unique_cities = df["city"].unique()
+print(unique_cities)
+
+# Frequency table
+counts = df["city"].value_counts(dropna=False)
+print(counts)
+</code></pre>
+
+<pre><code class="language-text">
+Bilbao     2
+Madrid     2
+Sevilla    1
+NaN        1
+Name: city, dtype: int64
+</code></pre>
+
+<p>
+  <code>dropna=False</code> keeps missing values in the count; by default, they’re excluded.
+  <code>unique()</code> returns a NumPy array; <code>value_counts()</code> returns a Series sorted by frequency.
+</p>
+
+<h4>Relative frequencies</h4>
+<pre><code class="language-python">
+# Normalized proportions (sum to 1)
+df["city"].value_counts(normalize=True, dropna=False).round(2)
+</code></pre>
+
+<p>
+  Normalization is a quick way to turn raw counts into probabilities — perfect for sanity checks or pie charts.
+</p>
+
+<h4>Top categories</h4>
+<pre><code class="language-python">
+# Top N values
+df["city"].value_counts().head(3)
+
+# Detect rare categories
+rare = df["city"].value_counts()[lambda s: s &lt; 2].index
+print("Rare:", list(rare))
+</code></pre>
+
+<p>
+  Identifying rare or misspelled entries helps catch data quality issues before modeling.
+</p>
+
+<h4>Multiple columns</h4>
+<pre><code class="language-python">
+# Unique combinations
+df[["city", "sales"]].drop_duplicates()
+
+# Count by groups
+df.groupby("city")["sales"].count()
+</code></pre>
+
+<p>
+  For relational exploration, group counts show data completeness per category.
+</p>
+
+<h4>Bonus: categorical dtype optimization</h4>
+<pre><code class="language-python">
+# Convert to categorical for memory efficiency
+df["city"] = df["city"].astype("category")
+print(df["city"].cat.categories)
+print(df.memory_usage(deep=True))
+</code></pre>
+
+<p>
+  Storing repeated strings as <code>category</code> saves huge amounts of memory and speeds up <code>value_counts()</code> dramatically.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Use <code>unique()</code> to discover what’s there; use <code>value_counts()</code> to understand how it’s distributed.
+  Always inspect frequencies before encoding or modeling — most categorical headaches start with unseen categories or typos.
+</p>
+
+<p>
+  🔗 References:
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.unique.html" target="_blank">
+    pandas.Series.unique()
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.Series.value_counts.html" target="_blank">
+    pandas.Series.value_counts()
+  </a>
+</p>

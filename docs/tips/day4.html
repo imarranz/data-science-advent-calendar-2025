@@ -1,0 +1,90 @@
+<p>
+  Missing values (<code>NaN</code> = “Not a Number”) are inevitable in real-world data.
+  <strong>pandas</strong> provides simple and powerful tools to detect, remove, or replace them.
+</p>
+
+<h4>Detecting missing values</h4>
+<pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "name": ["Alice", "Bob", "Charlie", None],
+    "age": [25, np.nan, 30, 40],
+    "score": [85, 92, None, 70]
+})
+
+print(df)
+</code></pre>
+
+<pre><code class="language-python">
+# Detect which cells are missing
+df.isna()
+
+# Count missing values per column
+df.isna().sum()
+
+# Quick overview
+df.info()
+</code></pre>
+
+<p>
+  <code>isna()</code> returns a Boolean mask indicating where values are missing.
+  You can combine it with <code>sum()</code> or <code>any()</code> to summarize missingness.
+</p>
+
+<h4>Dropping missing data</h4>
+<pre><code class="language-python">
+# Drop any rows containing NaN
+df_clean = df.dropna()
+
+# Drop only if all values in a row are NaN
+df_partial = df.dropna(how="all")
+
+# Drop columns with missing data
+df_cols = df.dropna(axis="columns")
+</code></pre>
+
+<p>
+  Dropping rows can be convenient, but it’s risky if you lose too much data.
+  In practice, it’s often better to fill or impute missing values.
+</p>
+
+<h4>Filling missing data</h4>
+<pre><code class="language-python">
+# Replace NaN with a constant
+df_filled = df.fillna(0)
+
+# Fill with a statistic (per column)
+df_filled_mean = df.fillna(df.mean(numeric_only=True))
+
+# Forward-fill (use last valid value)
+df_ffill = df.fillna(method="ffill")
+
+# Backward-fill (use next valid value)
+df_bfill = df.fillna(method="bfill")
+</code></pre>
+
+<p>
+  You can fill selectively per column too:
+</p>
+
+<pre><code class="language-python">
+df["age"] = df["age"].fillna(df["age"].mean())
+df["name"] = df["name"].fillna("Unknown")
+</code></pre>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Always check <code>df.isna().sum()</code> before deciding how to handle missing data.
+  Dropping is fast but potentially destructive.
+  Imputing (filling) preserves structure and is usually safer — especially before modeling.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://pandas.pydata.org/docs/user_guide/missing_data.html" target="_blank">
+    pandas user guide — Working with missing data
+  </a>
+</p>
+

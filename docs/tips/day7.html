@@ -1,0 +1,96 @@
+ <p>
+  Indexing and slicing are the bread and butter of <strong>NumPy</strong>.
+  They let you extract, rearrange, or mask data without copying arrays —
+  which makes these operations both elegant and efficient.
+</p>
+
+<h4>Basic indexing</h4>
+<pre><code class="language-python">
+import numpy as np
+
+X = np.arange(16).reshape(4, 4)
+print(X)
+</code></pre>
+
+<pre><code class="language-text">
+[[ 0  1  2  3]
+ [ 4  5  6  7]
+ [ 8  9 10 11]
+ [12 13 14 15]]
+</code></pre>
+
+<p>
+  You can access elements using row and column indices:
+</p>
+
+<pre><code class="language-python">
+X[0, 1]      # single element (row 0, col 1) → 1
+X[2]         # entire row 2
+X[:, 0]      # entire first column
+</code></pre>
+
+<h4>Slicing</h4>
+<p>
+  NumPy slicing follows Python’s standard <code>start:stop:step</code> syntax.
+</p>
+
+<pre><code class="language-python">
+X[0, 1:3]     # row 0, columns 1–2
+X[::2, ::2]   # every 2nd row and column
+X[:2, 2:]     # top 2 rows, last 2 columns
+</code></pre>
+
+<p>
+  Slicing returns a <em>view</em> (not a copy) of the original array — changes affect the original data.
+</p>
+
+<pre><code class="language-python">
+sub = X[:2, :2]
+sub[0, 0] = 999
+print(X[0, 0])  # the original array changed too!
+</code></pre>
+
+<h4>Boolean and fancy indexing</h4>
+<pre><code class="language-python">
+mask = X % 2 == 0
+evens = X[mask]    # extract all even numbers
+print(evens)
+</code></pre>
+
+<pre><code class="language-python">
+# Fancy indexing with lists of positions
+rows = [0, 2]
+cols = [1, 3]
+print(X[rows, cols])  # [1, 11]
+</code></pre>
+
+<p>
+  Boolean masks and fancy indexing return <em>copies</em> of the data, not views —
+  so modifications don’t affect the original array.
+</p>
+
+<h4>Multi-dimensional selection</h4>
+<pre><code class="language-python">
+# Select a rectangular block
+block = X[1:3, 1:3]
+print(block)
+</code></pre>
+
+<pre><code class="language-text">
+[[ 5  6]
+ [ 9 10]]
+</code></pre>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Use slicing when you can — it’s fast and memory-efficient.
+  Use fancy or boolean indexing when you need flexible, non-contiguous selection.
+  Always remember: slicing → view (cheap), fancy indexing → copy (safe).
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://numpy.org/doc/stable/user/basics.indexing.html" target="_blank">
+    NumPy User Guide — Indexing and slicing
+  </a>
+</p>

@@ -1,0 +1,83 @@
+ <p>
+  An <strong>inset axis</strong> is a small plot inside a larger one — perfect for zooming into a region,
+  showing a secondary view, or adding context without cluttering the main figure.
+</p>
+
+<h4>Basic inset example</h4>
+<pre><code class="language-python">
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 10, 500)
+y = np.sin(x) * np.exp(-0.1 * x)
+
+fig, ax = plt.subplots()
+ax.plot(x, y, color="steelblue")
+ax.set_title("Inset and Secondary Views")
+
+# Create an inset axis: [left, bottom, width, height] in relative (0–1) coordinates
+ins = ax.inset_axes([0.6, 0.55, 0.35, 0.35])
+ins.plot(x, y, color="darkorange")
+ins.set_title("Inset", fontsize=9)
+plt.show()
+</code></pre>
+
+<p>
+  The coordinates <code>[0.6, 0.55, 0.35, 0.35]</code> place the inset inside the parent axes,
+  expressed as a fraction of the main plot’s width and height.
+</p>
+
+<h4>Zooming into a region</h4>
+<pre><code class="language-python">
+# Highlight a region in the inset
+x_zoom = x[(x > 2) & (x < 4)]
+y_zoom = y[(x > 2) & (x < 4)]
+ins.plot(x_zoom, y_zoom, color="darkorange")
+ins.set_xlim(2, 4)
+ins.set_ylim(-0.5, 1.0)
+</code></pre>
+
+<p>
+  You can visually connect the inset to the zoomed area using <code>ax.indicate_inset_zoom()</code>.
+</p>
+
+<pre><code class="language-python">
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
+
+# Using inset_locator utilities for connection lines
+ins = inset_axes(ax, width="35%", height="35%", loc="upper right")
+ins.plot(x, y, color="darkorange")
+ax.indicate_inset_zoom(ins, edgecolor="gray")
+</code></pre>
+
+<h4>Secondary axes (shared data)</h4>
+<pre><code class="language-python">
+# Secondary axis for alternative units
+def mph_to_kph(x): return x * 1.609
+def kph_to_mph(x): return x / 1.609
+
+secax = ax.secondary_xaxis('top', functions=(kph_to_mph, mph_to_kph))
+secax.set_xlabel("Speed (mph)")
+</code></pre>
+
+<p>
+  Secondary axes provide alternative scales (for example, °C ↔ °F, miles ↔ km) without changing the underlying data.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Keep inset plots minimal — they should clarify, not distract.
+  Use them to zoom, show residuals, or display related metrics compactly.
+  If you find yourself adding too many insets, consider arranging subplots instead.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://matplotlib.org/stable/gallery/subplots_axes_and_figures/axes_inset.html" target="_blank">
+    Matplotlib gallery — Inset axes and zoom
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://matplotlib.org/stable/api/secondary_axes.html" target="_blank">
+    Secondary axes API
+  </a>
+</p>

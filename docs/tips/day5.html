@@ -1,0 +1,91 @@
+<p>
+  Once your data is clean, the next step is summarizing it — computing averages, counts, or other statistics by group.
+  In <strong>pandas</strong>, <code>groupby()</code> and <code>agg()</code> form a powerful duo for this task.
+</p>
+
+<h4>Basic example</h4>
+<pre><code class="language-python">
+import pandas as pd
+
+df = pd.DataFrame({
+    "species": ["cat", "dog", "cat", "dog", "parrot"],
+    "weight": [4.5, 10.2, 5.1, 8.8, 1.0],
+    "age": [3, 5, 2, 7, 4]
+})
+
+print(df)
+</code></pre>
+
+<pre><code class="language-python">
+# Group by species and compute mean weight
+df.groupby("species")["weight"].mean()
+
+# Multiple stats per group
+df.groupby("species")["weight"].agg(["mean", "max", "min"])
+</code></pre>
+
+<p>
+  By default, <code>groupby()</code> sets the grouped column as the index.
+  To keep it as a regular column, use <code>as_index=False</code>.
+</p>
+
+<pre><code class="language-python">
+(df
+  .groupby("species", as_index=False)
+  .agg(mean_weight=("weight", "mean"),
+       avg_age=("age", "mean"),
+       n=("weight", "size"))
+)
+</code></pre>
+
+<h4>Group by multiple columns</h4>
+<pre><code class="language-python">
+df = pd.DataFrame({
+    "continent": ["Europe", "Europe", "Asia", "Asia", "Africa"],
+    "species": ["cat", "dog", "cat", "dog", "parrot"],
+    "weight": [4.5, 10.2, 5.1, 8.8, 1.0]
+})
+
+summary = (df
+  .groupby(["continent", "species"], as_index=False)
+  .agg(avg_weight=("weight", "mean"))
+)
+print(summary)
+</code></pre>
+
+<p>
+  This produces one row per unique combination of continent and species, with the average weight per group.
+</p>
+
+<h4>Custom aggregation functions</h4>
+<pre><code class="language-python">
+# Define your own function
+def weight_range(x):
+    return x.max() - x.min()
+
+df.groupby("species")["weight"].agg(
+    mean_weight="mean",
+    range_weight=weight_range
+)
+</code></pre>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  <code>groupby()</code> returns a lazy “grouped” object — it doesn’t compute until you call
+  <code>agg()</code>, <code>mean()</code>, <code>sum()</code>, etc.
+  You can chain operations for readability, like:
+</p>
+
+<pre><code class="language-python">
+(df.groupby("species")
+   .agg(avg_weight=("weight","mean"))
+   .sort_values("avg_weight", ascending=False))
+</code></pre>
+
+<p>
+  🔗 Reference:
+  <a href="https://pandas.pydata.org/docs/user_guide/groupby.html" target="_blank">
+    pandas user guide — Grouping and aggregation
+  </a>
+</p>
+

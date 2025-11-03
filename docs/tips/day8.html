@@ -1,0 +1,90 @@
+ <p>
+  One of the biggest strengths of the Python data stack is how smoothly
+  <strong>pandas</strong> and <strong>NumPy</strong> talk to each other.
+  You can easily convert between DataFrames and NumPy arrays — a round-trip that’s fast and memory-efficient.
+</p>
+
+<h4>From pandas → NumPy</h4>
+<pre><code class="language-python">
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "a": [10, 20, 30],
+    "b": [1.1, 2.2, 3.3],
+    "c": ["x", "y", "z"]
+})
+
+# Extract specific columns as a NumPy array
+arr = df[["a", "b"]].to_numpy()
+print(type(arr))
+print(arr)
+</code></pre>
+
+<pre><code class="language-text">
+<class 'numpy.ndarray'>
+[[10.   1.1]
+ [20.   2.2]
+ [30.   3.3]]
+</code></pre>
+
+<p>
+  <code>to_numpy()</code> gives you the underlying numerical data.
+  It’s the recommended modern alternative to the older <code>.values</code> attribute.
+</p>
+
+<h4>From NumPy → pandas</h4>
+<pre><code class="language-python">
+# Create a new DataFrame from a NumPy array
+df2 = pd.DataFrame(arr, columns=["a", "b"])
+print(df2)
+</code></pre>
+
+<pre><code class="language-text">
+     a    b
+0  10.0  1.1
+1  20.0  2.2
+2  30.0  3.3
+</code></pre>
+
+<p>
+  Pandas automatically aligns columns and creates a default integer index,
+  but you can pass a custom index or dtypes if you need more control:
+</p>
+
+<pre><code class="language-python">
+index = ["row1", "row2", "row3"]
+df3 = pd.DataFrame(arr, columns=["a", "b"], index=index)
+print(df3.dtypes)
+</code></pre>
+
+<h4>Combining the two worlds</h4>
+<pre><code class="language-python">
+# Perform vectorized math in NumPy, then bring results back to pandas
+arr_scaled = arr * np.array([0.1, 10])
+df["scaled_a"], df["scaled_b"] = arr_scaled[:, 0], arr_scaled[:, 1]
+print(df)
+</code></pre>
+
+<p>
+  This pattern — doing fast numerical work in NumPy and then re-wrapping results into a DataFrame —
+  is common in data science workflows.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  When converting large objects, be mindful of data types:
+  <code>to_numpy()</code> may upcast mixed dtypes to <code>object</code> arrays,
+  which can be slower. For pure numeric data, conversions are nearly free.
+</p>
+
+<p>
+  🔗 Reference:
+  <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_numpy.html" target="_blank">
+    pandas.DataFrame.to_numpy() documentation
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html" target="_blank">
+    numpy.array() reference
+  </a>
+</p>

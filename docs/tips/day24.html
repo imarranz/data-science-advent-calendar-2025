@@ -1,0 +1,138 @@
+<p>
+  Multiple plots in one figure help compare patterns side by side — but without discipline, they quickly become unreadable.
+  <strong>Matplotlib</strong> gives fine control over shared axes, spacing, and alignment for clean, professional layouts.
+</p>
+
+<h4>Basic shared-axis layout</h4>
+<pre><code class="language-python">
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 10, 200)
+y = np.sin(x)
+
+fig, axes = plt.subplots(2, 2, sharex=True, sharey=True, figsize=(6, 4))
+
+for i, ax in enumerate(axes.ravel(), start=1):
+    ax.plot(x, y * i, lw=2)
+    ax.set_title(f"Plot {i}", fontsize=9)
+
+fig.suptitle("Clean Multi-Subplot Layouts", fontsize=12, fontweight="bold")
+fig.tight_layout()
+plt.show()
+</code></pre>
+
+<p>
+  <code>sharex=True</code> and <code>sharey=True</code> align axes perfectly across subplots,
+  while <code>tight_layout()</code> ensures spacing adjusts automatically to avoid overlap.
+</p>
+
+<h4>Adjust spacing manually</h4>
+<pre><code class="language-python">
+# Add space between rows or columns
+fig.subplots_adjust(hspace=0.3, wspace=0.25)
+</code></pre>
+
+<p>
+  <code>hspace</code> and <code>wspace</code> (height and width spacing) are fractions of the subplot dimensions.
+  Use them when <code>tight_layout()</code> still leaves labels too close.
+</p>
+
+<h4>Shared labels and global titles</h4>
+<pre><code class="language-python">
+# Common labels for all subplots
+fig.text(0.5, 0.02, "X-axis label", ha="center")
+fig.text(0.04, 0.5, "Y-axis label", va="center", rotation="vertical")
+
+# Figure-level title
+fig.suptitle("Experiment Overview", y=1.02, fontsize=13)
+</code></pre>
+
+<p>
+  Figure text elements (<code>fig.text()</code>) act in normalized 0–1 coordinates,
+  making them ideal for global axis labels or annotations outside the subplot grid.
+</p>
+
+<h4>Using <code>gridspec</code> for flexible layouts</h4>
+<pre><code class="language-python">
+import matplotlib.gridspec as gridspec
+
+fig = plt.figure(figsize=(6, 4))
+gs = gridspec.GridSpec(2, 3, figure=fig)
+
+ax1 = fig.add_subplot(gs[0, :])      # top row spans all columns
+ax2 = fig.add_subplot(gs[1, 0:2])    # bottom left (2 columns)
+ax3 = fig.add_subplot(gs[1, 2])      # bottom right
+
+ax1.plot(x, np.sin(x)); ax2.plot(x, np.cos(x)); ax3.plot(x, np.tan(x))
+fig.tight_layout()
+plt.show()
+</code></pre>
+
+<p>
+  <code>GridSpec</code> gives surgical control — perfect for dashboards, insets, or asymmetrical designs.
+</p>
+
+<h4>Aligning labels and legends</h4>
+<pre><code class="language-python">
+for ax in axes[-1, :]:
+    ax.set_xlabel("Time (s)")
+for ax in axes[:, 0]:
+    ax.set_ylabel("Value")
+
+# Align all y-labels
+fig.align_ylabels(axes[:, 0])
+</code></pre>
+
+<p>
+  Consistent labeling across subplots keeps the grid visually balanced.
+  <code>align_ylabels()</code> and <code>align_xlabels()</code> are your friends for that last bit of polish.
+</p>
+
+<h4>Complex grids: Subgrids and subfigures</h4>
+<pre><code class="language-python">
+fig = plt.figure(constrained_layout=True, figsize=(7, 4))
+subfigs = fig.subfigures(1, 2, wspace=0.07)
+
+axs_left = subfigs[0].subplots(2, 1, sharex=True)
+axs_right = subfigs[1].subplots(2, 1, sharex=True)
+
+for ax in axs_left.ravel():
+    ax.plot(x, np.sin(x))
+for ax in axs_right.ravel():
+    ax.plot(x, np.cos(x))
+
+subfigs[0].suptitle("Sine")
+subfigs[1].suptitle("Cosine")
+fig.suptitle("Subfigures Example", fontsize=12)
+plt.show()
+</code></pre>
+
+<p>
+  <code>subfigures</code> (Matplotlib ≥3.4) let you nest layouts, each with its own title or colorbar —
+  powerful for multi-panel figures in scientific papers.
+</p>
+
+<h4>Practical tip 🧠</h4>
+<p>
+  Keep your multi-panel plots <em>visually consistent</em>:
+  shared axes, aligned labels, and equal scales make comparisons meaningful.
+  Use <code>GridSpec</code> for flexibility, and <code>tight_layout()</code> or <code>constrained_layout=True</code> to tidy up the result.
+  A clean layout often matters more than fancy colors.
+</p>
+
+<p>
+  🔗 References:
+  <a href="https://matplotlib.org/stable/gallery/subplots_axes_and_figures/subplots_demo.html" target="_blank">
+    Matplotlib gallery — Subplots and grids
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://matplotlib.org/stable/tutorials/intermediate/gridspec.html" target="_blank">
+    GridSpec tutorial
+  </a>
+  &nbsp;|&nbsp;
+  <a href="https://matplotlib.org/stable/users/explain/figures/subfigures.html" target="_blank">
+    Subfigures guide
+  </a>
+</p>
+
