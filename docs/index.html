@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Ibon Martínez-Arranz">
+  <meta property="article:author" content="https://github.com/imarranz" />
+  <meta property="og:site_name" content="Data Science Advent Calendar 2025" />
+  <meta property="og:url" content="https://imarranz.github.io/data-science-book-hub/" />
+  <meta property="og:description" content="A Data Science Advent Calendar offering a new daily tip on machine learning, analytics, programming, and data visualization. Learn something useful every day." />
 <title>Data Science Advent Calendar</title>
 <style>
-/* ===========================
-   Calendario DS · Estilos base
-   =========================== */
+/* ============================
+   Calendario DS | Estilos base
+   ============================ */
 
 :root{
   /* Paleta */
@@ -21,19 +26,20 @@
   --azul-ciencia: #6B99A6;            /* R107 G153 B166 (7696 C) */
   --verde-innovacion: #82E5B8;        /* R130 G229 B184 (345 C) */
   --morado: #5C2959;                  /* R92 G41 B89 (7652 C) */
-
+  /* escalas */
+  /* amarillo */
   --amarillo-claro: #FFEF80;          /* R255 G239 B128 */
   --amarillo-medio-oscuro: #CC9B00;   /* R204 G155 B0 */
   --amarillo-sombra: #996A00;         /* R153 G106 B0 */
-
+  /* azul */
   --azul-ciencia-claro: #B7D3DB;      /* R183 G211 B219 */
   --azul-ciencia-medio-oscuro: #3A6674; /* R58 G102 B116 */
   --azul-ciencia-sombra: #224B58;     /* R34 G75 B88 */
-
+  /* verde */
   --verde-innovacion-claro: #C6F9E1;  /* R198 G249 B225 */
   --verde-innovacion-medio-oscuro: #3CAD85; /* R60 G173 B133 */
   --verde-innovacion-sombra: #14795A; /* R20 G121 B90 */
-
+  /* morado */
   --morado-claro: #BC9ABB;            /* R188 G154 B187 */
   --morado-medio-oscuro: #42153F;     /* R66 G21 B63 */
   --morado-sombra: #260A2A;           /* R38 G10 B42 */
@@ -43,9 +49,9 @@
   --gap: 1rem;
 
   /* Imagen decorativa de regalo */
-  --gift-size: 130px;                   /* tamaño base */
-  --gift-offset: 0.75rem;               /* separación a bordes */
-  --gift-opacity: 0.80;                 /* discreta para legibilidad */
+  --gift-size: 130px;                    /* tamaño base */
+  --gift-offset: 0.75rem;                /* separación a bordes */
+  --gift-opacity: 0.80;                  /* discreta para legibilidad */
   --gift-url: url("img/presents.png");   /* ruta por defecto */
 }
 
@@ -294,9 +300,51 @@ h1{
 @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px){  .grid{ grid-template-columns: 1fr; } }
 */
-<link rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-      <text y='0.9em' font-size='85'>🎁</text></svg>">
+
+    .menu-container {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      font-family: Arial, sans-serif;
+      z-index: 10000;
+    }
+
+    .menu-button {
+      font-size: 24px;
+      cursor: pointer;
+      background: #333;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+    }
+
+    .menu-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: var(--amarillo-claro);
+      min-width: 600px;
+      box-shadow: 0px 2px 8px rgba(100,100,100,0.2);
+      padding: 10px;
+      border-radius: 15px;
+      z-index: 9999;
+    }
+
+    .menu-dropdown a {
+      display: block;
+      padding: 5px 0;
+      color: #0073e6;
+      text-decoration: none;
+    }
+
+    .menu-dropdown a:hover {
+      text-decoration: underline;
+    }
+
+    .menu-dropdown.show {
+      display: block;
+    }
+
 
 </style>
 <link rel="icon" type="image/svg" href="img/christmas-tree.svg">
@@ -304,6 +352,7 @@ h1{
 <body>
 
 <h1>Data Science Advent Calendar</h1>
+
 <p class="meta">24 days of cards, each day unlocking resources, libraries, books, or clever coding tips.</p>
 
 <section class="grid" id="cal-grid">
@@ -643,9 +692,29 @@ h1{
     </div>
   </article>
 
+  <div class="menu-container">
+    <div class="menu-button" onclick="toggleMenu()">&#9776;</div>
+      <div class="menu-dropdown" id="menu">
+        <p style="font-size:1.5rem;"><strong>Data Science Advent Calendar</strong></p>
+        <hr>
+        <p style="color:var(--black); font-size:0.89rem; margin-top:2px;">
+          A daily collection of short, practical Data Science tips for students, professionals, and curious learners.
+          Open one tip per day, explore concepts, improve your workflow, and pick up something new throughout the season.
+        </p>
+        <p>&#128100; Ibon Martínez-Arranz (@imarranz)</p>
+        <a href="https://github.com/imarranz/data-science-advent-calendar-2025" target="_blank"><strong>&#128194; go to the repository</strong></a>
+      </div>
+    </div>
+  </div>
+
 </section>
 
 <script>
+
+  function toggleMenu() {
+    document.getElementById("menu").classList.toggle("show");
+  }
+
   // Toggle accesible
   function toggleCard(card, forceOpen) {
     const btn = card.querySelector('.toggle');
@@ -688,12 +757,12 @@ h1{
   // ==========================
   (function () {
     // Simulación opcional: pon una fecha ISO ('2025-12-10') o null para usar la real
-    const FECHA_FORZADA = '2025-12-05'; //const FECHA_FORZADA = null;
+    const FECHA_FORZADA = null; //const FECHA_FORZADA = '2025-12-05'; //const FECHA_FORZADA = null;
 
     // Rango del calendario de adviento
-    const START_MONTH = 11; // diciembre (0=enero,...,11=diciembre)
-    const START_DAY   = 1;
-    const END_DAY     = 24;
+    const START_MONTH = 11; // Diciembre (0=enero,...,11=diciembre)
+    const START_DAY   =  1; // Empieza el día 1
+    const END_DAY     = 24; // Acaba el día 24
 
     const hoy = FECHA_FORZADA ? new Date(FECHA_FORZADA) : new Date();
     const ahora = isNaN(hoy.getTime()) ? new Date() : hoy;
